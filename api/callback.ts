@@ -6,6 +6,9 @@ import axios from 'axios';
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { oauth_token, oauth_verifier } = req.query;
 
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Expose-Headers', 'Location');
+
   if (!oauth_token || !oauth_verifier) {
     return res.status(400).json({ error: 'Parâmetros ausentes' });
   }

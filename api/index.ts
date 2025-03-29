@@ -5,10 +5,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { oauth_token, oauth_token_secret } = await getOAuthRequestToken();
 
-    // Salva o oauth_token_secret em cookie
-    res.setHeader('Set-Cookie', `oauth_token_secret=${oauth_token_secret}; Path=/; HttpOnly; Secure; SameSite=Lax`);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Expose-Headers', 'Location');
+    res.setHeader(
+      'Set-Cookie',
+      `oauth_token_secret=${oauth_token_secret}; Path=/; HttpOnly; Secure; SameSite=Lax`
+    );
 
-    // Redireciona pro Twitter
     const authURL = `https://api.twitter.com/oauth/authenticate?oauth_token=${oauth_token}`;
     res.redirect(authURL);
   } catch (err: any) {
