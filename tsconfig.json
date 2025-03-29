@@ -1,18 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES6", 
-    "module": "commonjs", 
-    "strict": true, 
-    "esModuleInterop": true, 
-    "skipLibCheck": true, 
-    "forceConsistentCasingInFileNames": true, 
-    "outDir": "./dist", 
-    "rootDir": "./src" 
+    "target": "ES6",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./"
   },
-  "include": [
-    "src/**/*.ts" 
-  ],
-  "exclude": [
-    "node_modules" 
-  ]
+  "include": ["src/**/*.ts", "api/index.ts", "api/callback.ts"],
+  "exclude": ["node_modules"]
 }
