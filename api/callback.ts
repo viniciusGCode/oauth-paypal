@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { getOAuthAccessToken } from '../lib/auth';
-import cookie from 'cookie';
+import * as cookie from 'cookie';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { oauth_token, oauth_verifier } = req.query;
@@ -14,15 +14,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const oauth_token_secret = cookies.oauth_token_secret;
 
     if (!oauth_token_secret) {
-      return res
-        .status(400)
-        .json({ error: 'Token secret não encontrado no cookie' });
+      return res.status(400).json({ error: 'Token secret não encontrado no cookie' });
     }
 
-    console.log('Token recebido:', {
+    console.log("Token recebido:", {
       oauth_token,
       oauth_verifier,
-      oauth_token_secret,
+      oauth_token_secret
     });
 
     const { accessToken, accessSecret, results } = await getOAuthAccessToken(
