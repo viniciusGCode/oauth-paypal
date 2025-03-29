@@ -27,6 +27,7 @@
   "dependencies": {
     "@vercel/node": "^5.1.14",
     "axios": "^1.8.4",
+    "cookie": "^1.0.2",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "oauth": "^0.10.2",
