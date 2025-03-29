@@ -1,0 +1,4 @@
+IP: ::1
+Horário: 2025-03-29T17:50:44.018Z
+Permissões: offline.access, dm.read, tweet.write, users.read, dm.write, tweet.read
+----------------------
