@@ -16,76 +16,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ✅ Trata requisição GET (redirecionamento do Twitter)
   if (req.method === 'GET') {
-    const { oauth_token, oauth_verifier } = req.query;
+    const { oauth_token, oauth_verifier, secret } = req.query;
 
+    // Renderiza o HTML com script que envia o POST
     return res.send(`
       <html>
-        <head>
-          <title>Login com Twitter</title>
-          <style>
-            body {
-              font-family: sans-serif;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              height: 100vh;
-              background-color: #f0f8ff;
-              color: #333;
-              text-align: center;
-            }
-            .box {
-              background: white;
-              padding: 2em;
-              border-radius: 8px;
-              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
-          </style>
-        </head>
+        <head><title>Login com Twitter</title></head>
         <body>
-          <div class="box" id="status">
-            <h2>Finalizando login com Twitter...</h2>
-            <p>Por favor, aguarde...</p>
-          </div>
-  
+          <div id="status">Finalizando login...</div>
           <script>
             (async () => {
-              const oauth_token = "${oauth_token}";
-              const oauth_verifier = "${oauth_verifier}";
-              const oauth_token_secret = localStorage.getItem("oauth_token_secret");
+              const response = await fetch("/api/callback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  oauth_token: "${oauth_token}",
+                  oauth_verifier: "${oauth_verifier}",
+                  oauth_token_secret: "${secret}"
+                })
+              });
   
-              if (!oauth_token || !oauth_verifier || !oauth_token_secret) {
-                console.log(oauth_token, oauth_verifier, oauth_token_secret)
-                document.getElementById("status").innerHTML = "<h3>Erro: dados incompletos.</h3>";
-                return;
-              }
+              const result = await response.json();
   
-              try {
-                const response = await fetch("/api/callback", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify({
-                    oauth_token,
-                    oauth_verifier,
-                    oauth_token_secret
-                  })
-                });
-  
-                const result = await response.json();
-  
-                if (response.ok) {
-                  document.getElementById("status").innerHTML = \`
-                    <h2>✅ Login com Twitter concluído!</h2>
-                    <p>Usuário: @\${result.user?.screen_name}</p>
-                    <p>Agora você pode fechar esta aba.</p>
-                  \`;
-                } else {
-                  document.getElementById("status").innerHTML = "<h3>Erro ao autenticar com o Twitter.</h3>";
-                }
-              } catch (e) {
-                document.getElementById("status").innerHTML = "<h3>Erro de rede.</h3>";
-                console.error(e);
+              if (response.ok) {
+                document.getElementById("status").innerHTML = "<h2>✅ Login concluído!</h2><p>Você pode fechar esta aba.</p>";
+              } else {
+                document.getElementById("status").innerText = "Erro ao autenticar com o Twitter.";
               }
             })();
           </script>
