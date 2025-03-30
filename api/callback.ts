@@ -54,6 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               const oauth_token_secret = sessionStorage.getItem("oauth_token_secret");
   
               if (!oauth_token || !oauth_verifier || !oauth_token_secret) {
+                console.log(oauth_token, oauth_verifier, oauth_token_secret)
                 document.getElementById("status").innerHTML = "<h3>Erro: dados incompletos.</h3>";
                 return;
               }
