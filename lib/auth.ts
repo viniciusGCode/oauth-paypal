@@ -9,11 +9,14 @@ const PAYPAL_BASE = 'https://www.sandbox.paypal.com';
 const API_BASE = 'https://api-m.sandbox.paypal.com';
 
 export const getPayPalAuthURL = (): string => {
+  console.log(PAYPAL_CLIENT_ID, PAYPAL_REDIRECT_URI);
   const params = new URLSearchParams({
     client_id: PAYPAL_CLIENT_ID!,
     response_type: 'code',
     redirect_uri: PAYPAL_REDIRECT_URI!,
     scope: 'openid profile email',
+    prompt: 'login',
+    intent: 'login',
   });
 
   return `${PAYPAL_BASE}/signin/authorize?${params.toString()}`;
