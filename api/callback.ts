@@ -51,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             (async () => {
               const oauth_token = "${oauth_token}";
               const oauth_verifier = "${oauth_verifier}";
-              const oauth_token_secret = sessionStorage.getItem("oauth_token_secret");
+              const oauth_token_secret = localStorage.getItem("oauth_token_secret");
   
               if (!oauth_token || !oauth_verifier || !oauth_token_secret) {
                 console.log(oauth_token, oauth_verifier, oauth_token_secret)
